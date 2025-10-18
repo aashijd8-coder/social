@@ -441,8 +441,8 @@
                     <!-- Corrected mute/unmute ImageButton: no inline comment inside the tag -->
                     <ImageButton
                         android:id="@+id/btnMute"
-                        android:layout_width="52dp"
-                        android:layout_height="52dp"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
                         android:layout_alignParentEnd="true"
                         android:layout_alignParentBottom="true"
                         android:layout_margin="12dp"
