@@ -120,6 +120,7 @@ import finix.social.finixapp.util.Api;
 import finix.social.finixapp.util.CountingRequestBody;
 import finix.social.finixapp.util.CustomRequest;
 import finix.social.finixapp.util.Helper;
+import androidx.emoji.text.EmojiCompat;
 
 public class ProfileFragment extends Fragment implements Constants, SwipeRefreshLayout.OnRefreshListener {
 
@@ -1176,7 +1177,18 @@ public class ProfileFragment extends Fragment implements Constants, SwipeRefresh
         mProfileLocation.setText(profile.getLocation());
         mProfileFacebookPage.setText(profile.getFacebookPage());
         mProfileInstagramPage.setText(profile.getInstagramPage());
-        mProfileBio.setText(profile.getBio());
+        try {
+            // If EmojiCompat initialized, use it to process the bio so emojis render correctly
+            EmojiCompat emojiCompat = EmojiCompat.get();
+            if (emojiCompat != null && emojiCompat.getLoadState() == EmojiCompat.LOAD_STATE_SUCCEEDED) {
+                mProfileBio.setText(emojiCompat.process(profile.getBio()));
+            } else {
+                mProfileBio.setText(profile.getBio());
+            }
+        } catch (IllegalStateException e) {
+            // EmojiCompat not initialized — fallback to plain text
+            mProfileBio.setText(profile.getBio());
+        }
 
         Drawable img = getContext().getResources().getDrawable(R.drawable.ic_messages);
         img.setBounds(0, 0, (int) (img.getIntrinsicWidth() * 0.5), (int) (img.getIntrinsicHeight() * 0.5));
@@ -1380,7 +1392,7 @@ public class ProfileFragment extends Fragment implements Constants, SwipeRefresh
                 if (profile.isFollow()) {
 
                     mProfileActionMain.setText(R.string.action_cancel_friends_request);
-                   // mAddFriendIcon.setImageResource(R.drawable.ic_friend_cancel);
+                    // mAddFriendIcon.setImageResource(R.drawable.ic_friend_cancel);
 
                 } else {
 
@@ -3349,8 +3361,8 @@ public class ProfileFragment extends Fragment implements Constants, SwipeRefresh
 
                 if (App.getInstance().getGiftsList().size() != 0) {
 
-                     mDlgRecyclerView.setVisibility(View.VISIBLE);
-                     mProgressBar.setVisibility(View.GONE);
+                    mDlgRecyclerView.setVisibility(View.VISIBLE);
+                    mProgressBar.setVisibility(View.GONE);
                 }
             }
         });
@@ -3442,8 +3454,8 @@ public class ProfileFragment extends Fragment implements Constants, SwipeRefresh
 
                 if (App.getInstance().getFeelingsList().size() != 0) {
 
-                     mDlgRecyclerView.setVisibility(View.VISIBLE);
-                     mProgressBar.setVisibility(View.GONE);
+                    mDlgRecyclerView.setVisibility(View.VISIBLE);
+                    mProgressBar.setVisibility(View.GONE);
                 }
             }
         });
