@@ -123,6 +123,9 @@ import finix.social.finixapp.view.ResizableImageView;
 
 
 public class AdvancedItemListAdapter extends RecyclerView.Adapter<AdvancedItemListAdapter.ViewHolder> implements Constants, TagClick {
+    // default to true to keep previous behaviour (autoplay starts muted)
+    private boolean autoplayMuted = true;
+
     // === Shared ExoPlayer + state (merged) ===
     private com.google.android.exoplayer2.ExoPlayer sharedPlayer = null;
     private DefaultTrackSelector sharedTrackSelector = null;
@@ -225,7 +228,7 @@ public class AdvancedItemListAdapter extends RecyclerView.Adapter<AdvancedItemLi
                 RecyclerView.ViewHolder vh = attachedRecyclerView.findViewHolderForAdapterPosition(bestPos);
                 if (vh instanceof ViewHolder) {
                     ViewHolder holder = (ViewHolder) vh;
-                    playVideo(holder, bestPos, true); // auto-muted
+                    playVideo(holder, bestPos, autoplayMuted); // auto-muted
                 }
             }
         } else {
@@ -448,9 +451,11 @@ public class AdvancedItemListAdapter extends RecyclerView.Adapter<AdvancedItemLi
                 if (sharedPlayer.getVolume() == 0f) {
                     sharedPlayer.setVolume(1f);
                     holder.btnMute.setImageResource(R.drawable.volume_on);
+                    autoplayMuted = false; // remember user unmuted
                 } else {
                     sharedPlayer.setVolume(0f);
                     holder.btnMute.setImageResource(R.drawable.volume_off);
+                    autoplayMuted = true; // user muted
                 }
             } catch (Throwable ignore) {}
         });
@@ -998,15 +1003,17 @@ public class AdvancedItemListAdapter extends RecyclerView.Adapter<AdvancedItemLi
                 exoPlayer.prepare();
                 exoPlayer.setPlayWhenReady(true);
 
-                exoPlayer.setVolume(0f); // default mute
-                holder.btnMute.setImageResource(R.drawable.volume_off);
+                exoPlayer.setVolume(autoplayMuted ? 0f : 1f); // default mute
+                holder.btnMute.setImageResource(autoplayMuted ? R.drawable.volume_off : R.drawable.volume_on);
                 holder.btnMute.setOnClickListener(muteBtn -> {
                     if (exoPlayer.getVolume() == 0f) {
                         exoPlayer.setVolume(1f);
                         holder.btnMute.setImageResource(R.drawable.volume_on);
+                        autoplayMuted = false; // remember user unmuted
                     } else {
                         exoPlayer.setVolume(0f);
                         holder.btnMute.setImageResource(R.drawable.volume_off);
+                        autoplayMuted = true; // remember user muted
                     }
                 });
 
